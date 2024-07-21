@@ -7,9 +7,26 @@
 
 #define EEPROM_SIZE 1
 
-#define BUTTON_DEBOUCE  200
+#define TOUCH_GPIO          4
+#define TOUCH_THRESHOLD     80
+#define BUTTON_DEBOUCE      1000
 
-NeoPixelBus<NeoGrbFeature, NeoEsp32I2s1X8Ws2812xMethod> rgb(1, 13);
+#define LED_GPIO            12
+
+#define SERIAL_INPUT_1      35
+#define SERIAL_INPUT_2      27
+#define SERIAL_INPUT_3      26
+#define SERIAL_INPUT_4      25
+#define SERIAL_INPUT_5      33
+#define SERIAL_INPUT_6      32
+
+// SD Card GPIOs
+// CS   13
+// MOSI 15
+// MISO  2
+// SCK  14
+
+NeoPixelBus<NeoGrbFeature, NeoEsp32I2s1X8Ws2812xMethod> rgb(1, LED_GPIO);
 
 #if defined(CONFIG_IDF_TARGET_ESP32S3)
 #define NUM_PORTS 7
@@ -37,8 +54,7 @@ void pressed() {
 
 __attribute__((unused)) void setup() {
   memset(bufPos, 0, sizeof(bufPos));
-  pinMode(0, INPUT);
-  attachInterrupt(0, pressed, FALLING);
+  touchAttachInterrupt(TOUCH_GPIO, pressed, TOUCH_THRESHOLD);
 
   EEPROM.begin(EEPROM_SIZE);
   Serial.begin(921600);
@@ -46,14 +62,25 @@ __attribute__((unused)) void setup() {
   Serial.flush();
   button_pressed = false;
   rgb.Begin();
-  rgb.SetPixelColor(0, RgbColor(64, 0, 0));
-  rgb.Show();
+
+  for (int i = 0; i < 3; i++)
+  {
+    delay(100);
+    rgb.SetPixelColor(0, RgbColor(0, 0, 64));
+    rgb.Show();
+    delay(100);
+    rgb.SetPixelColor(0, RgbColor(0, 64, 0));
+    rgb.Show();
+    delay(100);
+    rgb.SetPixelColor(0, RgbColor(64, 0, 0));
+    rgb.Show();
+  }
 }
 
 static void writeBuffer(const int port) {
   Serial.print(port+1);
   file.write('1' + port);
-  file.write(',');
+  file.write(' ');
   file.write(buf[port], bufPos[port]);
   bufPos[port] = 0;
 }
@@ -108,10 +135,16 @@ void startSerials() {
   Serial2.begin(460800, SERIAL_8N1, 19, -1);
   Serial0.flush(false);
 #else
-  Serial1.begin(460800, SERIAL_8N1, 14, -1);
-  Serial2.begin(460800, SERIAL_8N1, 27, -1);
+  Serial1.begin(460800, SERIAL_8N1, SERIAL_INPUT_1, -1);
+  Serial2.begin(460800, SERIAL_8N1, SERIAL_INPUT_2, -1);
 #endif
 
+#define SERIAL_INPUT_1      35
+#define SERIAL_INPUT_2      27
+#define SERIAL_INPUT_3      26
+#define SERIAL_INPUT_4      25
+#define SERIAL_INPUT_5      33
+#define SERIAL_INPUT_6      32
   rmt_uart_config_t config = {
     .baud_rate = 460800,
     .mode = RMT_UART_MODE_RX_ONLY,
@@ -122,17 +155,17 @@ void startSerials() {
     .rx_io_num = GPIO_NUM_NC,
     .buffer_size = 1024
   };
-  config.rx_io_num = GPIO_NUM_26;
+  config.rx_io_num = (gpio_num_t)SERIAL_INPUT_3;
   rmt_uart_init(RMT_UART_NUM_0, &config);
   pinMode(config.rx_io_num, INPUT_PULLUP);
-  config.rx_io_num = GPIO_NUM_25;
+  config.rx_io_num = (gpio_num_t)SERIAL_INPUT_4;
+  rmt_uart_init(RMT_UART_NUM_1, &config);
+  pinMode(config.rx_io_num, INPUT_PULLUP);
+  config.rx_io_num = (gpio_num_t)SERIAL_INPUT_5;
   rmt_uart_init(RMT_UART_NUM_2, &config);
   pinMode(config.rx_io_num, INPUT_PULLUP);
-  config.rx_io_num = GPIO_NUM_33;
-  rmt_uart_init(RMT_UART_NUM_4, &config);
-  pinMode(config.rx_io_num, INPUT_PULLUP);
-  config.rx_io_num = GPIO_NUM_32;
-  rmt_uart_init(RMT_UART_NUM_6, &config);
+  config.rx_io_num = (gpio_num_t)SERIAL_INPUT_6;
+  rmt_uart_init(RMT_UART_NUM_3, &config);
   pinMode(config.rx_io_num, INPUT_PULLUP);
   Serial1.flush(false);
   Serial2.flush(false);
