@@ -8,7 +8,7 @@
 #define EEPROM_SIZE 1
 
 #define TOUCH_GPIO          4
-#define TOUCH_THRESHOLD     80
+#define TOUCH_THRESHOLD     40
 #define BUTTON_DEBOUCE      1000
 
 #define LED_GPIO            12
