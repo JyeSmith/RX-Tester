@@ -81,10 +81,10 @@ __attribute__((unused)) void setup() {
 
 static void writeBuffer(const int port) {
   Serial.print(port+1);
-  file.write(millis() - logStartTime);
-  file.write(' ');
+  file.print(millis() - logStartTime);
+  file.write('\t');
   file.write('1' + port);
-  file.write(' ');
+  file.write('\t');
   file.write(buf[port], bufPos[port]);
   bufPos[port] = 0;
 }
