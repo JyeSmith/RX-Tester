@@ -43,12 +43,14 @@ File file;
 char filename[12]={0};
 bool button_pressed = false;
 uint32_t buttonLastPressed = 0;
+uint32_t logStartTime;
 
 void pressed() {
   uint32_t now = millis();
   if (BUTTON_DEBOUCE < now - buttonLastPressed) {
     button_pressed = true;
     buttonLastPressed = now;
+    logStartTime = now;
   }
 }
 
@@ -79,7 +81,7 @@ __attribute__((unused)) void setup() {
 
 static void writeBuffer(const int port) {
   Serial.print(port+1);
-  file.write(millis());
+  file.write(millis() - logStartTime);
   file.write(' ');
   file.write('1' + port);
   file.write(' ');
