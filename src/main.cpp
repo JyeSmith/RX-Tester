@@ -79,6 +79,8 @@ __attribute__((unused)) void setup() {
 
 static void writeBuffer(const int port) {
   Serial.print(port+1);
+  file.write(millis());
+  file.write(' ');
   file.write('1' + port);
   file.write(' ');
   file.write(buf[port], bufPos[port]);
