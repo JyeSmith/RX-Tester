@@ -139,12 +139,6 @@ void startSerials() {
   Serial2.begin(460800, SERIAL_8N1, SERIAL_INPUT_2, -1);
 #endif
 
-#define SERIAL_INPUT_1      35
-#define SERIAL_INPUT_2      27
-#define SERIAL_INPUT_3      26
-#define SERIAL_INPUT_4      25
-#define SERIAL_INPUT_5      33
-#define SERIAL_INPUT_6      32
   rmt_uart_config_t config = {
     .baud_rate = 460800,
     .mode = RMT_UART_MODE_RX_ONLY,
@@ -159,13 +153,13 @@ void startSerials() {
   rmt_uart_init(RMT_UART_NUM_0, &config);
   pinMode(config.rx_io_num, INPUT_PULLUP);
   config.rx_io_num = (gpio_num_t)SERIAL_INPUT_4;
-  rmt_uart_init(RMT_UART_NUM_1, &config);
-  pinMode(config.rx_io_num, INPUT_PULLUP);
-  config.rx_io_num = (gpio_num_t)SERIAL_INPUT_5;
   rmt_uart_init(RMT_UART_NUM_2, &config);
   pinMode(config.rx_io_num, INPUT_PULLUP);
+  config.rx_io_num = (gpio_num_t)SERIAL_INPUT_5;
+  rmt_uart_init(RMT_UART_NUM_4, &config);
+  pinMode(config.rx_io_num, INPUT_PULLUP);
   config.rx_io_num = (gpio_num_t)SERIAL_INPUT_6;
-  rmt_uart_init(RMT_UART_NUM_3, &config);
+  rmt_uart_init(RMT_UART_NUM_6, &config);
   pinMode(config.rx_io_num, INPUT_PULLUP);
   Serial1.flush(false);
   Serial2.flush(false);
